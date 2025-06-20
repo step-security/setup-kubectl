@@ -30,7 +30,7 @@ jobs:
         uses: actions/github-script@v6
         id: team-check
         with:
-         github-token: ${{ secrets.GITHUB_TOKEN }}
+         github-token: ${{ secrets.ORG_READ_TOKEN }}
          script: |
             const prAuthor = context.payload.pull_request.user.login;
             const org = 'step-security';
@@ -56,6 +56,7 @@ jobs:
                if (error.status === 404) {
                core.setOutput('allowed', false);
                console.log(`${prAuthor} is not in the team`);
+               console.log({error});
                } else {
                throw error;
                }
