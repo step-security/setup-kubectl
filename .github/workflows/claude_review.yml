@@ -45,9 +45,13 @@ jobs:
                username: prAuthor
                });
 
-               const isMember = res.data && res.data.state === 'active';
-               core.setOutput('allowed', isMember);
-               console.log(`${prAuthor} is in the team: ${isMember}`);
+               if (res.data.state === 'active') {
+                core.setOutput('allowed', true);
+                console.log(`${prAuthor} is an active member of the team.`);
+               } else {
+                  core.setOutput('allowed', false);
+                  console.log(`${prAuthor} is not an active team member. State: ${res.data.state}`);
+               }
             } catch (error) {
                if (error.status === 404) {
                core.setOutput('allowed', false);
