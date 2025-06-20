@@ -1,37 +1,74 @@
-name: Claude Code
+name: Claude Code Review
 
 on:
-   issue_comment:
-      types: [created]
-   pull_request_review_comment:
-      types: [created]
-   issues:
-      types: [opened, assigned]
-   pull_request_review:
-      types: [submitted]
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
-   claude:
-      if: |
-         (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-         (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-         (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-         (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
-      runs-on: ubuntu-latest
-      permissions:
-         contents: read
-         pull-requests: read
-         issues: read
-         id-token: write
-      steps:
-         - name: Checkout repository
-           uses: actions/checkout@v4
-           with:
-              fetch-depth: 1
 
-         - name: Run Claude Code
-           id: claude
-           uses: anthropics/claude-code-action@beta
-           with:
-              anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-              model: 'claude-opus-4-20250514'
+  claude-review:    
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@rc
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      
+      - name: Check if PR author is in a specific team
+        uses: actions/github-script@v6
+        id: team-check
+        with:
+         github-token: ${{ secrets.GITHUB_TOKEN }}
+         script: |
+            const prAuthor = context.payload.pull_request.user.login;
+            const org = 'step-security';
+            const teamSlug = 'maintained-actions-dev';
+
+            console.log(`Checking if ${prAuthor} is in team ${teamSlug}...`);
+
+            try {
+               const res = await github.rest.teams.getMembershipForUserInOrg({
+               org,
+               team_slug: teamSlug,
+               username: prAuthor
+               });
+
+               const isMember = res.data && res.data.state === 'active';
+               core.setOutput('allowed', isMember);
+               console.log(`${prAuthor} is in the team: ${isMember}`);
+            } catch (error) {
+               if (error.status === 404) {
+               core.setOutput('allowed', false);
+               console.log(`${prAuthor} is not in the team`);
+               } else {
+               throw error;
+               }
+            }
+
+      - name: Run Claude Code Review
+        # Optional: Filter by PR author
+        if: steps.team-check.outputs.allowed == 'true'
+        id: claude-review
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          
+          # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4)
+          # model: "claude-opus-4-20250514"
+          
+          # Direct prompt for automated review (no @claude mention needed)
+          direct_prompt: |
+            Please review this pull request on the basis of CLAUDE.md file.
+         
