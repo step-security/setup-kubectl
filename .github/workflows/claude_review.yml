@@ -2,7 +2,7 @@ name: Claude Code Review
 
 on:
   pull_request:
-    types: [labeled]
+    types: [opened, synchronize, labeled]
 
 jobs:
 
@@ -28,7 +28,7 @@ jobs:
  
       - name: Run Claude Code Review
         # Optional: Filter by PR author
-        if: ${{ github.event.label.name == 'review required' }}
+        if: contains(join(github.event.pull_request.labels.*.name, ','), 'review required')
         id: claude-review
         uses: anthropics/claude-code-action@beta
         with:
