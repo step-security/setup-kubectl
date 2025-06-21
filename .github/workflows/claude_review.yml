@@ -2,7 +2,7 @@ name: Claude Code Review
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, labeled]
 
 jobs:
 
@@ -25,46 +25,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      
-      - name: Check if PR author is in a specific team
-        uses: actions/github-script@v6
-        id: team-check
-        with:
-         github-token: ${{ secrets.ORG_READ_TOKEN }}
-         script: |
-            const prAuthor = context.payload.pull_request.user.login;
-            const org = 'step-security';
-            const teamSlug = 'maintained-actions-dev';
-
-            console.log(`Checking if ${prAuthor} is in team ${teamSlug}...`);
-
-            try {
-               const res = await github.rest.teams.getMembershipForUserInOrg({
-               org,
-               team_slug: teamSlug,
-               username: prAuthor
-               });
-
-               if (res.data.state === 'active') {
-                core.setOutput('allowed', true);
-                console.log(`${prAuthor} is an active member of the team.`);
-               } else {
-                  core.setOutput('allowed', false);
-                  console.log(`${prAuthor} is not an active team member. State: ${res.data.state}`);
-               }
-            } catch (error) {
-               if (error.status === 404) {
-               core.setOutput('allowed', false);
-               console.log(`${prAuthor} is not in the team`);
-               console.log({error});
-               } else {
-               throw error;
-               }
-            }
-
+ 
       - name: Run Claude Code Review
         # Optional: Filter by PR author
-        if: steps.team-check.outputs.allowed == 'true'
+        if: ${{ github.event.label.name == 'review required' }}
         id: claude-review
         uses: anthropics/claude-code-action@beta
         with:
