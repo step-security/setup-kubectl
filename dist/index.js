@@ -10607,19 +10607,10 @@ function getExecutableExtension() {
 /***/ }),
 
 /***/ 9786:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = run;
 exports.getStableKubectlVersion = getStableKubectlVersion;
@@ -10630,80 +10621,91 @@ const fs = __nccwpck_require__(9896);
 const toolCache = __nccwpck_require__(3472);
 const core = __nccwpck_require__(7484);
 const axios_1 = __nccwpck_require__(7269);
-function validateSubscription() {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a;
-        const API_URL = `https://agent.api.stepsecurity.io/v1/github/${process.env.GITHUB_REPOSITORY}/actions/subscription`;
-        try {
-            yield axios_1.default.get(API_URL, { timeout: 3000 });
+async function validateSubscription() {
+    const eventPath = process.env.GITHUB_EVENT_PATH;
+    let repoPrivate;
+    if (eventPath && fs.existsSync(eventPath)) {
+        const eventData = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+        repoPrivate = eventData?.repository?.private;
+    }
+    const upstream = 'Azure/setup-kubectl';
+    const action = process.env.GITHUB_ACTION_REPOSITORY;
+    const docsUrl = 'https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions';
+    core.info('');
+    core.info('\u001b[1;36mStepSecurity Maintained Action\u001b[0m');
+    core.info(`Secure drop-in replacement for ${upstream}`);
+    if (repoPrivate === false)
+        core.info('\u001b[32m\u2713 Free for public repositories\u001b[0m');
+    core.info(`\u001b[36mLearn more:\u001b[0m ${docsUrl}`);
+    core.info('');
+    if (repoPrivate === false)
+        return;
+    const serverUrl = process.env.GITHUB_SERVER_URL || 'https://github.com';
+    const body = { action: action || '' };
+    if (serverUrl !== 'https://github.com')
+        body.ghes_server = serverUrl;
+    try {
+        await axios_1.default.post(`https://agent.api.stepsecurity.io/v1/github/${process.env.GITHUB_REPOSITORY}/actions/maintained-actions-subscription`, body, { timeout: 3000 });
+    }
+    catch (error) {
+        if ((0, axios_1.isAxiosError)(error) && error.response?.status === 403) {
+            core.error(`\u001b[1;31mThis action requires a StepSecurity subscription for private repositories.\u001b[0m`);
+            core.error(`\u001b[31mLearn how to enable a subscription: ${docsUrl}\u001b[0m`);
+            process.exit(1);
         }
-        catch (error) {
-            if ((0, axios_1.isAxiosError)(error) && ((_a = error.response) === null || _a === void 0 ? void 0 : _a.status) === 403) {
-                core.error('Subscription is not valid. Reach out to support@stepsecurity.io');
-                process.exit(1);
-            }
-            else {
-                core.info('Timeout or API not reachable. Continuing to next step.');
-            }
-        }
-    });
+        core.info('Timeout or API not reachable. Continuing to next step.');
+    }
 }
 const helpers_1 = __nccwpck_require__(1302);
 const kubectlToolName = 'kubectl';
 const stableKubectlVersion = 'v1.15.0';
 const stableVersionUrl = 'https://storage.googleapis.com/kubernetes-release/release/stable.txt';
-function run() {
-    return __awaiter(this, void 0, void 0, function* () {
-        yield validateSubscription();
-        let version = core.getInput('version', { required: true });
-        if (version.toLocaleLowerCase() === 'latest') {
-            version = yield getStableKubectlVersion();
+async function run() {
+    await validateSubscription();
+    let version = core.getInput('version', { required: true });
+    if (version.toLocaleLowerCase() === 'latest') {
+        version = await getStableKubectlVersion();
+    }
+    const cachedPath = await downloadKubectl(version);
+    core.addPath(path.dirname(cachedPath));
+    core.debug(`Kubectl tool version: '${version}' has been cached at ${cachedPath}`);
+    core.setOutput('kubectl-path', cachedPath);
+}
+async function getStableKubectlVersion() {
+    return toolCache.downloadTool(stableVersionUrl).then((downloadPath) => {
+        let version = fs.readFileSync(downloadPath, 'utf8').toString().trim();
+        if (!version) {
+            version = stableKubectlVersion;
         }
-        const cachedPath = yield downloadKubectl(version);
-        core.addPath(path.dirname(cachedPath));
-        core.debug(`Kubectl tool version: '${version}' has been cached at ${cachedPath}`);
-        core.setOutput('kubectl-path', cachedPath);
+        return version;
+    }, (error) => {
+        core.debug(error);
+        core.warning('GetStableVersionFailed');
+        return stableKubectlVersion;
     });
 }
-function getStableKubectlVersion() {
-    return __awaiter(this, void 0, void 0, function* () {
-        return toolCache.downloadTool(stableVersionUrl).then((downloadPath) => {
-            let version = fs.readFileSync(downloadPath, 'utf8').toString().trim();
-            if (!version) {
-                version = stableKubectlVersion;
-            }
-            return version;
-        }, (error) => {
-            core.debug(error);
-            core.warning('GetStableVersionFailed');
-            return stableKubectlVersion;
-        });
-    });
-}
-function downloadKubectl(version) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let cachedToolpath = toolCache.find(kubectlToolName, version);
-        let kubectlDownloadPath = '';
-        const arch = (0, helpers_1.getKubectlArch)();
-        if (!cachedToolpath) {
-            try {
-                kubectlDownloadPath = yield toolCache.downloadTool((0, helpers_1.getkubectlDownloadURL)(version, arch));
-            }
-            catch (exception) {
-                if (exception instanceof toolCache.HTTPError &&
-                    exception.httpStatusCode === 404) {
-                    throw new Error(util.format("Kubectl '%s' for '%s' arch not found.", version, arch));
-                }
-                else {
-                    throw new Error('DownloadKubectlFailed');
-                }
-            }
-            cachedToolpath = yield toolCache.cacheFile(kubectlDownloadPath, kubectlToolName + (0, helpers_1.getExecutableExtension)(), kubectlToolName, version);
+async function downloadKubectl(version) {
+    let cachedToolpath = toolCache.find(kubectlToolName, version);
+    let kubectlDownloadPath = '';
+    const arch = (0, helpers_1.getKubectlArch)();
+    if (!cachedToolpath) {
+        try {
+            kubectlDownloadPath = await toolCache.downloadTool((0, helpers_1.getkubectlDownloadURL)(version, arch));
         }
-        const kubectlPath = path.join(cachedToolpath, kubectlToolName + (0, helpers_1.getExecutableExtension)());
-        fs.chmodSync(kubectlPath, '775');
-        return kubectlPath;
-    });
+        catch (exception) {
+            if (exception instanceof toolCache.HTTPError &&
+                exception.httpStatusCode === 404) {
+                throw new Error(util.format("Kubectl '%s' for '%s' arch not found.", version, arch));
+            }
+            else {
+                throw new Error('DownloadKubectlFailed');
+            }
+        }
+        cachedToolpath = await toolCache.cacheFile(kubectlDownloadPath, kubectlToolName + (0, helpers_1.getExecutableExtension)(), kubectlToolName, version);
+    }
+    const kubectlPath = path.join(cachedToolpath, kubectlToolName + (0, helpers_1.getExecutableExtension)());
+    fs.chmodSync(kubectlPath, '775');
+    return kubectlPath;
 }
 
 
