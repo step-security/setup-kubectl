@@ -12,6 +12,9 @@ import * as core from '@actions/core'
 import * as util from 'util'
 
 describe('Testing all functions in run file.', () => {
+   beforeEach(() => {
+      delete process.env.GITHUB_EVENT_PATH
+   })
    test('getExecutableExtension() - return .exe when os is Windows', () => {
       jest.spyOn(os, 'type').mockReturnValue('Windows_NT')
       expect(getExecutableExtension()).toBe('.exe')
