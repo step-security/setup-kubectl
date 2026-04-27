@@ -10483,8 +10483,12 @@ exports.debug = debug; // for test
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getKubectlArch = getKubectlArch;
 exports.getkubectlDownloadURL = getkubectlDownloadURL;
+exports.getLatestPatchVersion = getLatestPatchVersion;
 exports.getExecutableExtension = getExecutableExtension;
 const os = __nccwpck_require__(857);
+const fs = __nccwpck_require__(9896);
+const core = __nccwpck_require__(7484);
+const toolCache = __nccwpck_require__(3472);
 function getKubectlArch() {
     const arch = os.arch();
     if (arch === 'x64') {
@@ -10501,6 +10505,26 @@ function getkubectlDownloadURL(version, arch) {
         case 'Windows_NT':
         default:
             return `https://dl.k8s.io/release/${version}/bin/windows/${arch}/kubectl.exe`;
+    }
+}
+async function getLatestPatchVersion(major, minor) {
+    const version = `${major}.${minor}`;
+    const sourceURL = `https://dl.k8s.io/release/stable-${version}.txt`;
+    try {
+        const downloadPath = await toolCache.downloadTool(sourceURL);
+        const latestPatch = fs
+            .readFileSync(downloadPath, 'utf8')
+            .toString()
+            .trim();
+        if (!latestPatch) {
+            throw new Error(`No patch version found for ${version}`);
+        }
+        return latestPatch;
+    }
+    catch (error) {
+        core.debug(error);
+        core.warning('GetLatestPatchVersionFailed');
+        throw new Error(`Failed to get latest patch version for ${version}`);
     }
 }
 function getExecutableExtension() {
@@ -10566,7 +10590,7 @@ async function validateSubscription() {
 const helpers_1 = __nccwpck_require__(1302);
 const kubectlToolName = 'kubectl';
 const stableKubectlVersion = 'v1.15.0';
-const stableVersionUrl = 'https://storage.googleapis.com/kubernetes-release/release/stable.txt';
+const stableVersionUrl = 'https://dl.k8s.io/release/stable.txt';
 async function run() {
     await validateSubscription();
     let version = core.getInput('version', { required: true });
