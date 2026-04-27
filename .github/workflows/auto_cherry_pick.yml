@@ -26,9 +26,9 @@ permissions:
 
 jobs:
    cherry-pick:
+      if: github.event_name == 'workflow_dispatch' || contains(fromJson(toJson(github.event.pull_request.labels)).*.name, 'review-required')
       uses: step-security/reusable-workflows/.github/workflows/auto_cherry_pick.yaml@v1
       with:
-         if: github.event_name == 'workflow_dispatch' || contains(fromJson(toJson(github.event.pull_request.labels)).*.name, 'review-required')
          original-owner: 'Azure'
          repo-name: 'setup-kubectl'
          base_branch: ${{ inputs.base_branch }}
