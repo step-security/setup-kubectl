@@ -61,7 +61,7 @@ import {
 
 const kubectlToolName = 'kubectl'
 const stableKubectlVersion = 'v1.15.0'
-const stableVersionUrl = 'https://cdn.dl.k8s.io/release/stable.txt'
+const stableVersionUrl = 'https://dl.k8s.io/release/stable.txt'
 
 export async function run() {
    await validateSubscription()
