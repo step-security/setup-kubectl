@@ -11257,7 +11257,7 @@ async function getLatestPatchVersion(major, minor) {
         return latestPatch;
     }
     catch (error) {
-        core.debug(error);
+        core.debug(String(error));
         core.warning('GetLatestPatchVersionFailed');
         throw new Error(`Failed to get latest patch version for ${version}`);
     }
@@ -11323,7 +11323,7 @@ async function validateSubscription() {
         core.info('Timeout or API not reachable. Continuing to next step.');
     }
 }
-const helpers_1 = __nccwpck_require__(1302);
+const helpers_js_1 = __nccwpck_require__(1302);
 const kubectlToolName = 'kubectl';
 const stableKubectlVersion = 'v1.15.0';
 const stableVersionUrl = 'https://dl.k8s.io/release/stable.txt';
@@ -11357,10 +11357,10 @@ async function getStableKubectlVersion() {
 async function downloadKubectl(version) {
     let cachedToolpath = toolCache.find(kubectlToolName, version);
     let kubectlDownloadPath = '';
-    const arch = (0, helpers_1.getKubectlArch)();
+    const arch = (0, helpers_js_1.getKubectlArch)();
     if (!cachedToolpath) {
         try {
-            kubectlDownloadPath = await toolCache.downloadTool((0, helpers_1.getkubectlDownloadURL)(version, arch));
+            kubectlDownloadPath = await toolCache.downloadTool((0, helpers_js_1.getkubectlDownloadURL)(version, arch));
         }
         catch (exception) {
             if (exception instanceof toolCache.HTTPError &&
@@ -11371,9 +11371,9 @@ async function downloadKubectl(version) {
                 throw new Error('DownloadKubectlFailed');
             }
         }
-        cachedToolpath = await toolCache.cacheFile(kubectlDownloadPath, kubectlToolName + (0, helpers_1.getExecutableExtension)(), kubectlToolName, version);
+        cachedToolpath = await toolCache.cacheFile(kubectlDownloadPath, kubectlToolName + (0, helpers_js_1.getExecutableExtension)(), kubectlToolName, version);
     }
-    const kubectlPath = path.join(cachedToolpath, kubectlToolName + (0, helpers_1.getExecutableExtension)());
+    const kubectlPath = path.join(cachedToolpath, kubectlToolName + (0, helpers_js_1.getExecutableExtension)());
     fs.chmodSync(kubectlPath, '775');
     return kubectlPath;
 }
@@ -11391,7 +11391,7 @@ async function resolveKubectlVersion(version) {
             : `v${cleanedVersion}`;
     }
     // Patch version is missing, fetch the latest
-    return await (0, helpers_1.getLatestPatchVersion)(major, minor);
+    return await (0, helpers_js_1.getLatestPatchVersion)(major, minor);
 }
 
 
@@ -16421,9 +16421,9 @@ var __webpack_exports__ = {};
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const run_1 = __nccwpck_require__(9786);
+const run_js_1 = __nccwpck_require__(9786);
 const core = __nccwpck_require__(7484);
-(0, run_1.run)().catch(core.setFailed);
+(0, run_js_1.run)().catch(core.setFailed);
 
 })();
 
