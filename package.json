@@ -21,7 +21,7 @@
       "@actions/core": "^1.11.1",
       "@actions/exec": "^2.0.0",
       "@actions/tool-cache": "^2.0.2",
-      "axios": "^1.10.0"
+      "axios": "^1.15.2"
    },
    "devDependencies": {
       "@types/jest": "^30.0.0",
