@@ -1,6 +1,6 @@
 {
-   "name": "setup-kubectl-action",
-   "version": "5.0.0",
+   "name": "@step-security/setup-kubectl-action",
+   "version": "5.2.0",
    "private": true,
    "main": "dist/index.js",
    "type": "module",
@@ -18,18 +18,32 @@
       "setup"
    ],
    "author": "step-security",
+   "publisher": "step-security",
    "license": "MIT",
    "dependencies": {
-      "@actions/core": "^3.0.0",
+      "@actions/core": "^3.0.1",
       "@actions/exec": "^3.0.0",
+      "@actions/http-client": "^4.0.1",
       "@actions/tool-cache": "^4.0.0",
-      "axios": "^1.10.0"
+      "axios": "^1.20.0"
    },
    "devDependencies": {
-      "@types/node": "^24.0.2",
-      "esbuild": "^0.27.4",
-      "prettier": "3.5.3",
-      "typescript": "5.8.3",
-      "vitest": "^4.0.18"
+      "@types/node": "^26.4.1",
+      "esbuild": "^0.28.2",
+      "prettier": "3.9.6",
+      "typescript": "7.0.2",
+      "vitest": "^5.0.0"
+   },
+   "homepage": "https://github.com/step-security/setup-kubectl#readme",
+   "repository": {
+      "type": "git",
+      "url": "https://github.com/step-security/setup-kubectl.git"
+   },
+   "bugs": {
+      "url": "https://github.com/step-security/setup-kubectl/issues"
+   },
+   "engines": {
+      "node": ">=24",
+      "npm": ">=11"
    }
 }
