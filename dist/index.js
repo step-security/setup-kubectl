@@ -12,7 +12,11 @@ var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require
   throw Error('Dynamic require of "' + x + '" is not supported');
 });
 var __commonJS = (cb, mod) => function __require2() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
 };
 var __export = (target, all3) => {
   for (var name in all3)
@@ -39,7 +43,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var require_tunnel = __commonJS({
   "node_modules/tunnel/lib/tunnel.js"(exports) {
     "use strict";
-    var net = __require("net");
+    var net2 = __require("net");
     var tls = __require("tls");
     var http4 = __require("http");
     var https3 = __require("https");
@@ -966,7 +970,7 @@ var require_util = __commonJS({
     var { kDestroyed, kBodyUsed, kListeners, kBody } = require_symbols();
     var { IncomingMessage } = __require("node:http");
     var stream5 = __require("node:stream");
-    var net = __require("node:net");
+    var net2 = __require("node:net");
     var { Blob: Blob2 } = __require("node:buffer");
     var nodeUtil = __require("node:util");
     var { stringify } = __require("node:querystring");
@@ -1074,14 +1078,14 @@ var require_util = __commonJS({
         }
         const port = url2.port != null ? url2.port : url2.protocol === "https:" ? 443 : 80;
         let origin2 = url2.origin != null ? url2.origin : `${url2.protocol || ""}//${url2.hostname || ""}:${port}`;
-        let path5 = url2.path != null ? url2.path : `${url2.pathname || ""}${url2.search || ""}`;
+        let path6 = url2.path != null ? url2.path : `${url2.pathname || ""}${url2.search || ""}`;
         if (origin2[origin2.length - 1] === "/") {
           origin2 = origin2.slice(0, origin2.length - 1);
         }
-        if (path5 && path5[0] !== "/") {
-          path5 = `/${path5}`;
+        if (path6 && path6[0] !== "/") {
+          path6 = `/${path6}`;
         }
-        return new URL(`${origin2}${path5}`);
+        return new URL(`${origin2}${path6}`);
       }
       if (!isHttpOrHttpsPrefixed(url2.origin || url2.protocol)) {
         throw new InvalidArgumentError("Invalid URL protocol: the URL must start with `http:` or `https:`.");
@@ -1111,7 +1115,7 @@ var require_util = __commonJS({
       }
       assert(typeof host === "string");
       const servername = getHostname(host);
-      if (net.isIP(servername)) {
+      if (net2.isIP(servername)) {
         return "";
       }
       return servername;
@@ -1532,39 +1536,39 @@ var require_diagnostics = __commonJS({
       });
       diagnosticsChannel.channel("undici:client:sendHeaders").subscribe((evt) => {
         const {
-          request: { method, path: path5, origin: origin2 }
+          request: { method, path: path6, origin: origin2 }
         } = evt;
-        debuglog("sending request to %s %s/%s", method, origin2, path5);
+        debuglog("sending request to %s %s/%s", method, origin2, path6);
       });
       diagnosticsChannel.channel("undici:request:headers").subscribe((evt) => {
         const {
-          request: { method, path: path5, origin: origin2 },
+          request: { method, path: path6, origin: origin2 },
           response: { statusCode }
         } = evt;
         debuglog(
           "received response to %s %s/%s - HTTP %d",
           method,
           origin2,
-          path5,
+          path6,
           statusCode
         );
       });
       diagnosticsChannel.channel("undici:request:trailers").subscribe((evt) => {
         const {
-          request: { method, path: path5, origin: origin2 }
+          request: { method, path: path6, origin: origin2 }
         } = evt;
-        debuglog("trailers received from %s %s/%s", method, origin2, path5);
+        debuglog("trailers received from %s %s/%s", method, origin2, path6);
       });
       diagnosticsChannel.channel("undici:request:error").subscribe((evt) => {
         const {
-          request: { method, path: path5, origin: origin2 },
+          request: { method, path: path6, origin: origin2 },
           error: error2
         } = evt;
         debuglog(
           "request to %s %s/%s errored - %s",
           method,
           origin2,
-          path5,
+          path6,
           error2.message
         );
       });
@@ -1613,9 +1617,9 @@ var require_diagnostics = __commonJS({
         });
         diagnosticsChannel.channel("undici:client:sendHeaders").subscribe((evt) => {
           const {
-            request: { method, path: path5, origin: origin2 }
+            request: { method, path: path6, origin: origin2 }
           } = evt;
-          debuglog("sending request to %s %s/%s", method, origin2, path5);
+          debuglog("sending request to %s %s/%s", method, origin2, path6);
         });
       }
       diagnosticsChannel.channel("undici:websocket:open").subscribe((evt) => {
@@ -1678,7 +1682,7 @@ var require_request = __commonJS({
     var kHandler = /* @__PURE__ */ Symbol("handler");
     var Request = class {
       constructor(origin2, {
-        path: path5,
+        path: path6,
         method,
         body,
         headers,
@@ -1693,11 +1697,11 @@ var require_request = __commonJS({
         expectContinue,
         servername
       }, handler) {
-        if (typeof path5 !== "string") {
+        if (typeof path6 !== "string") {
           throw new InvalidArgumentError("path must be a string");
-        } else if (path5[0] !== "/" && !(path5.startsWith("http://") || path5.startsWith("https://")) && method !== "CONNECT") {
+        } else if (path6[0] !== "/" && !(path6.startsWith("http://") || path6.startsWith("https://")) && method !== "CONNECT") {
           throw new InvalidArgumentError("path must be an absolute URL or start with a slash");
-        } else if (invalidPathRegex.test(path5)) {
+        } else if (invalidPathRegex.test(path6)) {
           throw new InvalidArgumentError("invalid request path");
         }
         if (typeof method !== "string") {
@@ -1763,7 +1767,7 @@ var require_request = __commonJS({
         this.completed = false;
         this.aborted = false;
         this.upgrade = upgrade || null;
-        this.path = query ? buildURL2(path5, query) : path5;
+        this.path = query ? buildURL2(path6, query) : path6;
         this.origin = origin2;
         this.idempotent = idempotent == null ? method === "HEAD" || method === "GET" : idempotent;
         this.blocking = blocking == null ? false : blocking;
@@ -2504,7 +2508,7 @@ var require_timers = __commonJS({
 var require_connect = __commonJS({
   "node_modules/undici/lib/core/connect.js"(exports, module) {
     "use strict";
-    var net = __require("node:net");
+    var net2 = __require("node:net");
     var assert = __require("node:assert");
     var util6 = require_util();
     var { InvalidArgumentError, ConnectTimeoutError } = require_errors();
@@ -2600,7 +2604,7 @@ var require_connect = __commonJS({
         } else {
           assert(!httpSocket, "httpSocket can only be sent on TLS update");
           port = port || 80;
-          socket = net.connect({
+          socket = net2.connect({
             highWaterMark: 64 * 1024,
             // Same as nodejs fs streams.
             ...options,
@@ -4079,11 +4083,11 @@ var require_util2 = __commonJS({
     var { isUint8Array } = __require("node:util/types");
     var { webidl } = require_webidl();
     var supportedHashes = [];
-    var crypto4;
+    var crypto6;
     try {
-      crypto4 = __require("node:crypto");
+      crypto6 = __require("node:crypto");
       const possibleRelevantHashes = ["sha256", "sha384", "sha512"];
-      supportedHashes = crypto4.getHashes().filter((hash) => possibleRelevantHashes.includes(hash));
+      supportedHashes = crypto6.getHashes().filter((hash) => possibleRelevantHashes.includes(hash));
     } catch {
     }
     function responseURL(response) {
@@ -4356,7 +4360,7 @@ var require_util2 = __commonJS({
       }
     }
     function bytesMatch(bytes, metadataList) {
-      if (crypto4 === void 0) {
+      if (crypto6 === void 0) {
         return true;
       }
       const parsedMetadata = parseMetadata(metadataList);
@@ -4371,7 +4375,7 @@ var require_util2 = __commonJS({
       for (const item of metadata) {
         const algorithm = item.algo;
         const expectedValue = item.hash;
-        let actualValue = crypto4.createHash(algorithm).update(bytes).digest("base64");
+        let actualValue = crypto6.createHash(algorithm).update(bytes).digest("base64");
         if (actualValue[actualValue.length - 1] === "=") {
           if (actualValue[actualValue.length - 2] === "=") {
             actualValue = actualValue.slice(0, -2);
@@ -5435,8 +5439,8 @@ var require_body = __commonJS({
     var { multipartFormDataParser } = require_formdata_parser();
     var random;
     try {
-      const crypto4 = __require("node:crypto");
-      random = (max) => crypto4.randomInt(0, max);
+      const crypto6 = __require("node:crypto");
+      random = (max) => crypto6.randomInt(0, max);
     } catch {
       random = (max) => Math.floor(Math.random(max));
     }
@@ -6449,7 +6453,7 @@ var require_client_h1 = __commonJS({
       return method !== "GET" && method !== "HEAD" && method !== "OPTIONS" && method !== "TRACE" && method !== "CONNECT";
     }
     function writeH1(client, request) {
-      const { method, path: path5, host, upgrade, blocking, reset } = request;
+      const { method, path: path6, host, upgrade, blocking, reset } = request;
       let { body, headers, contentLength } = request;
       const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH" || method === "QUERY" || method === "PROPFIND" || method === "PROPPATCH";
       if (util6.isFormDataLike(body)) {
@@ -6530,7 +6534,7 @@ var require_client_h1 = __commonJS({
       if (blocking) {
         socket[kBlocking] = true;
       }
-      let header = `${method} ${path5} HTTP/1.1\r
+      let header = `${method} ${path6} HTTP/1.1\r
 `;
       if (typeof host === "string") {
         header += `host: ${host}\r
@@ -7061,7 +7065,7 @@ var require_client_h2 = __commonJS({
     }
     function writeH2(client, request) {
       const session = client[kHTTP2Session];
-      const { method, path: path5, host, upgrade, expectContinue, signal, headers: reqHeaders } = request;
+      const { method, path: path6, host, upgrade, expectContinue, signal, headers: reqHeaders } = request;
       let { body } = request;
       if (upgrade) {
         util6.errorRequest(client, request, new Error("Upgrade not supported for H2"));
@@ -7158,7 +7162,7 @@ var require_client_h2 = __commonJS({
         });
         return true;
       }
-      headers[HTTP2_HEADER_PATH] = path5;
+      headers[HTTP2_HEADER_PATH] = path6;
       headers[HTTP2_HEADER_SCHEME] = "https";
       const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH";
       if (body && typeof body.read === "function") {
@@ -7511,9 +7515,9 @@ var require_redirect_handler = __commonJS({
           return this.handler.onHeaders(statusCode, headers, resume, statusText);
         }
         const { origin: origin2, pathname, search } = util6.parseURL(new URL(this.location, this.opts.origin && new URL(this.opts.path, this.opts.origin)));
-        const path5 = search ? `${pathname}${search}` : pathname;
+        const path6 = search ? `${pathname}${search}` : pathname;
         this.opts.headers = cleanRequestHeaders(this.opts.headers, statusCode === 303, this.opts.origin !== origin2);
-        this.opts.path = path5;
+        this.opts.path = path6;
         this.opts.origin = origin2;
         this.opts.maxRedirections = 0;
         this.opts.query = null;
@@ -7616,7 +7620,7 @@ var require_client = __commonJS({
   "node_modules/undici/lib/dispatcher/client.js"(exports, module) {
     "use strict";
     var assert = __require("node:assert");
-    var net = __require("node:net");
+    var net2 = __require("node:net");
     var http4 = __require("node:http");
     var util6 = require_util();
     var { channels } = require_diagnostics();
@@ -7765,7 +7769,7 @@ var require_client = __commonJS({
         if (maxRequestsPerClient != null && (!Number.isInteger(maxRequestsPerClient) || maxRequestsPerClient < 0)) {
           throw new InvalidArgumentError("maxRequestsPerClient must be a positive number");
         }
-        if (localAddress != null && (typeof localAddress !== "string" || net.isIP(localAddress) === 0)) {
+        if (localAddress != null && (typeof localAddress !== "string" || net2.isIP(localAddress) === 0)) {
           throw new InvalidArgumentError("localAddress must be valid string IP address");
         }
         if (maxResponseSize != null && (!Number.isInteger(maxResponseSize) || maxResponseSize < -1)) {
@@ -7929,7 +7933,7 @@ var require_client = __commonJS({
         const idx = hostname.indexOf("]");
         assert(idx !== -1);
         const ip = hostname.substring(1, idx);
-        assert(net.isIP(ip));
+        assert(net2.isIP(ip));
         hostname = ip;
       }
       client[kConnecting] = true;
@@ -8748,10 +8752,10 @@ var require_proxy_agent = __commonJS({
         };
         const {
           origin: origin2,
-          path: path5 = "/",
+          path: path6 = "/",
           headers = {}
         } = opts;
-        opts.path = origin2 + path5;
+        opts.path = origin2 + path6;
         if (!("host" in headers) && !("Host" in headers)) {
           const { host } = new URL2(origin2);
           headers.host = host;
@@ -10723,20 +10727,20 @@ var require_mock_utils = __commonJS({
       }
       return true;
     }
-    function safeUrl(path5) {
-      if (typeof path5 !== "string") {
-        return path5;
+    function safeUrl(path6) {
+      if (typeof path6 !== "string") {
+        return path6;
       }
-      const pathSegments = path5.split("?");
+      const pathSegments = path6.split("?");
       if (pathSegments.length !== 2) {
-        return path5;
+        return path6;
       }
       const qp = new URLSearchParams(pathSegments.pop());
       qp.sort();
       return [...pathSegments, qp.toString()].join("?");
     }
-    function matchKey(mockDispatch2, { path: path5, method, body, headers }) {
-      const pathMatch = matchValue(mockDispatch2.path, path5);
+    function matchKey(mockDispatch2, { path: path6, method, body, headers }) {
+      const pathMatch = matchValue(mockDispatch2.path, path6);
       const methodMatch = matchValue(mockDispatch2.method, method);
       const bodyMatch = typeof mockDispatch2.body !== "undefined" ? matchValue(mockDispatch2.body, body) : true;
       const headersMatch = matchHeaders(mockDispatch2, headers);
@@ -10758,7 +10762,7 @@ var require_mock_utils = __commonJS({
     function getMockDispatch(mockDispatches, key) {
       const basePath = key.query ? buildURL2(key.path, key.query) : key.path;
       const resolvedPath = typeof basePath === "string" ? safeUrl(basePath) : basePath;
-      let matchedMockDispatches = mockDispatches.filter(({ consumed }) => !consumed).filter(({ path: path5 }) => matchValue(safeUrl(path5), resolvedPath));
+      let matchedMockDispatches = mockDispatches.filter(({ consumed }) => !consumed).filter(({ path: path6 }) => matchValue(safeUrl(path6), resolvedPath));
       if (matchedMockDispatches.length === 0) {
         throw new MockNotMatchedError(`Mock dispatch not matched for path '${resolvedPath}'`);
       }
@@ -10796,9 +10800,9 @@ var require_mock_utils = __commonJS({
       }
     }
     function buildKey(opts) {
-      const { path: path5, method, body, headers, query } = opts;
+      const { path: path6, method, body, headers, query } = opts;
       return {
-        path: path5,
+        path: path6,
         method,
         body,
         headers,
@@ -11261,10 +11265,10 @@ var require_pending_interceptors_formatter = __commonJS({
       }
       format(pendingInterceptors) {
         const withPrettyHeaders = pendingInterceptors.map(
-          ({ method, path: path5, data: { statusCode }, persist, times, timesInvoked, origin: origin2 }) => ({
+          ({ method, path: path6, data: { statusCode }, persist, times, timesInvoked, origin: origin2 }) => ({
             Method: method,
             Origin: origin2,
-            Path: path5,
+            Path: path6,
             "Status code": statusCode,
             Persistent: persist ? PERSISTENT : NOT_PERSISTENT,
             Invocations: timesInvoked,
@@ -11631,7 +11635,7 @@ var require_dump = __commonJS({
 var require_dns = __commonJS({
   "node_modules/undici/lib/interceptor/dns.js"(exports, module) {
     "use strict";
-    var { isIP } = __require("node:net");
+    var { isIP: isIP2 } = __require("node:net");
     var { lookup } = __require("node:dns");
     var DecoratorHandler = require_decorator_handler();
     var { InvalidArgumentError, InformationalError } = require_errors();
@@ -11886,7 +11890,7 @@ var require_dns = __commonJS({
       return (dispatch) => {
         return function dnsInterceptor(origDispatchOpts, handler) {
           const origin2 = origDispatchOpts.origin.constructor === URL ? origDispatchOpts.origin : new URL(origDispatchOpts.origin);
-          if (isIP(origin2.hostname) !== 0) {
+          if (isIP2(origin2.hostname) !== 0) {
             return dispatch(origDispatchOpts, handler);
           }
           instance.runLookup(origin2, origDispatchOpts, (err, newOrigin) => {
@@ -16145,9 +16149,9 @@ var require_util6 = __commonJS({
         }
       }
     }
-    function validateCookiePath(path5) {
-      for (let i = 0; i < path5.length; ++i) {
-        const code = path5.charCodeAt(i);
+    function validateCookiePath(path6) {
+      for (let i = 0; i < path6.length; ++i) {
+        const code = path6.charCodeAt(i);
         if (code < 32 || // exclude CTLs (0-31)
         code > 126 || // exclude DEL and non-ascii
         code === 59) {
@@ -17076,13 +17080,13 @@ var require_frame = __commonJS({
     "use strict";
     var { maxUnsigned16Bit } = require_constants5();
     var BUFFER_SIZE = 16386;
-    var crypto4;
+    var crypto6;
     var buffer = null;
     var bufIdx = BUFFER_SIZE;
     try {
-      crypto4 = __require("node:crypto");
+      crypto6 = __require("node:crypto");
     } catch {
-      crypto4 = {
+      crypto6 = {
         // not full compatibility, but minimum.
         randomFillSync: function randomFillSync(buffer2, _offset, _size) {
           for (let i = 0; i < buffer2.length; ++i) {
@@ -17095,7 +17099,7 @@ var require_frame = __commonJS({
     function generateMask() {
       if (bufIdx === BUFFER_SIZE) {
         bufIdx = 0;
-        crypto4.randomFillSync(buffer ??= Buffer.allocUnsafe(BUFFER_SIZE), 0, BUFFER_SIZE);
+        crypto6.randomFillSync(buffer ??= Buffer.allocUnsafe(BUFFER_SIZE), 0, BUFFER_SIZE);
       }
       return [buffer[bufIdx++], buffer[bufIdx++], buffer[bufIdx++], buffer[bufIdx++]];
     }
@@ -17167,9 +17171,9 @@ var require_connection = __commonJS({
     var { Headers: Headers2, getHeadersList } = require_headers();
     var { getDecodeSplit } = require_util2();
     var { WebsocketFrameSend } = require_frame();
-    var crypto4;
+    var crypto6;
     try {
-      crypto4 = __require("node:crypto");
+      crypto6 = __require("node:crypto");
     } catch {
     }
     function establishWebSocketConnection(url2, protocols, client, ws, onEstablish, options) {
@@ -17189,7 +17193,7 @@ var require_connection = __commonJS({
         const headersList = getHeadersList(new Headers2(options.headers));
         request.headersList = headersList;
       }
-      const keyValue = crypto4.randomBytes(16).toString("base64");
+      const keyValue = crypto6.randomBytes(16).toString("base64");
       request.headersList.append("sec-websocket-key", keyValue);
       request.headersList.append("sec-websocket-version", "13");
       for (const protocol of protocols) {
@@ -17219,7 +17223,7 @@ var require_connection = __commonJS({
             return;
           }
           const secWSAccept = response.headersList.get("Sec-WebSocket-Accept");
-          const digest = crypto4.createHash("sha1").update(keyValue + uid).digest("base64");
+          const digest = crypto6.createHash("sha1").update(keyValue + uid).digest("base64");
           if (secWSAccept !== digest) {
             failWebsocketConnection(ws, "Incorrect hash received in Sec-WebSocket-Accept header.");
             return;
@@ -18989,11 +18993,11 @@ var require_undici = __commonJS({
           if (typeof opts.path !== "string") {
             throw new InvalidArgumentError("invalid opts.path");
           }
-          let path5 = opts.path;
+          let path6 = opts.path;
           if (!opts.path.startsWith("/")) {
-            path5 = `/${path5}`;
+            path6 = `/${path6}`;
           }
-          url2 = new URL(util6.parseOrigin(url2).origin + path5);
+          url2 = new URL(util6.parseOrigin(url2).origin + path6);
         } else {
           if (!opts) {
             opts = typeof url2 === "object" ? url2 : {};
@@ -29841,11 +29845,11 @@ var require_mime_types = __commonJS({
       }
       return exts[0];
     }
-    function lookup(path5) {
-      if (!path5 || typeof path5 !== "string") {
+    function lookup(path6) {
+      if (!path6 || typeof path6 !== "string") {
         return false;
       }
-      var extension2 = extname("x." + path5).toLowerCase().substr(1);
+      var extension2 = extname("x." + path6).toLowerCase().substr(1);
       if (!extension2) {
         return false;
       }
@@ -30950,13 +30954,13 @@ var require_form_data = __commonJS({
     "use strict";
     var CombinedStream = require_combined_stream();
     var util6 = __require("util");
-    var path5 = __require("path");
+    var path6 = __require("path");
     var http4 = __require("http");
     var https3 = __require("https");
     var parseUrl2 = __require("url").parse;
     var fs6 = __require("fs");
     var Stream = __require("stream").Stream;
-    var crypto4 = __require("crypto");
+    var crypto6 = __require("crypto");
     var mime = require_mime_types();
     var asynckit = require_asynckit();
     var setToStringTag = require_es_set_tostringtag();
@@ -31081,11 +31085,11 @@ var require_form_data = __commonJS({
     FormData3.prototype._getContentDisposition = function(value, options) {
       var filename;
       if (typeof options.filepath === "string") {
-        filename = path5.normalize(options.filepath).replace(/\\/g, "/");
+        filename = path6.normalize(options.filepath).replace(/\\/g, "/");
       } else if (options.filename || value && (value.name || value.path)) {
-        filename = path5.basename(options.filename || value && (value.name || value.path));
+        filename = path6.basename(options.filename || value && (value.name || value.path));
       } else if (value && value.readable && hasOwn(value, "httpVersion")) {
-        filename = path5.basename(value.client._httpMessage.path || "");
+        filename = path6.basename(value.client._httpMessage.path || "");
       }
       if (filename) {
         return 'filename="' + escapeHeaderParam(filename) + '"';
@@ -31165,7 +31169,7 @@ var require_form_data = __commonJS({
       return Buffer.concat([dataBuffer, Buffer.from(this._lastBoundary())]);
     };
     FormData3.prototype._generateBoundary = function() {
-      this._boundary = "--------------------------" + crypto4.randomBytes(12).toString("hex");
+      this._boundary = "--------------------------" + crypto6.randomBytes(12).toString("hex");
     };
     FormData3.prototype.getLengthSync = function() {
       var knownLength = this._overheadLength + this._valueLength;
@@ -32896,9 +32900,10 @@ var require_follow_redirects = __commonJS({
 });
 
 // src/run.ts
-import * as path4 from "path";
+import * as path5 from "path";
 import * as util5 from "util";
 import * as fs5 from "fs";
+import * as crypto5 from "crypto";
 
 // node_modules/@actions/core/lib/command.js
 import * as os from "os";
@@ -34195,6 +34200,9 @@ var ExitCode;
   ExitCode2[ExitCode2["Success"] = 0] = "Success";
   ExitCode2[ExitCode2["Failure"] = 1] = "Failure";
 })(ExitCode || (ExitCode = {}));
+function setSecret(secret) {
+  issueCommand("add-mask", {}, secret);
+}
 function addPath(inputPath) {
   const filePath = process.env["GITHUB_PATH"] || "";
   if (filePath) {
@@ -34234,6 +34242,9 @@ function error(message, properties = {}) {
 }
 function warning(message, properties = {}) {
   issueCommand("warning", toCommandProperties(properties), message instanceof Error ? message.toString() : message);
+}
+function notice(message, properties = {}) {
+  issueCommand("notice", toCommandProperties(properties), message instanceof Error ? message.toString() : message);
 }
 function info(message) {
   process.stdout.write(message + os4.EOL);
@@ -35706,9 +35717,9 @@ function isVisitable(thing) {
 function removeBrackets(key) {
   return utils_default.endsWith(key, "[]") ? key.slice(0, -2) : key;
 }
-function renderKey(path5, key, dots) {
-  if (!path5) return key;
-  return path5.concat(key).map(function each(token, i) {
+function renderKey(path6, key, dots) {
+  if (!path6) return key;
+  return path6.concat(key).map(function each(token, i) {
     token = removeBrackets(token);
     return !dots && i ? "[" + token + "]" : token;
   }).join(dots ? "." : "");
@@ -35789,13 +35800,13 @@ function toFormData(obj, formData, options) {
       return currentValue;
     });
   }
-  function defaultVisitor(value, key, path5) {
+  function defaultVisitor(value, key, path6) {
     let arr = value;
     if (utils_default.isReactNative(formData) && utils_default.isReactNativeBlob(value)) {
-      formData.append(renderKey(path5, key, dots), convertValue(value));
+      formData.append(renderKey(path6, key, dots), convertValue(value));
       return false;
     }
-    if (value && !path5 && typeof value === "object") {
+    if (value && !path6 && typeof value === "object") {
       if (utils_default.endsWith(key, "{}")) {
         key = metaTokens ? key : key.slice(0, -2);
         value = stringifyWithDepthLimit(value, 1);
@@ -35814,7 +35825,7 @@ function toFormData(obj, formData, options) {
     if (isVisitable(value)) {
       return true;
     }
-    formData.append(renderKey(path5, key, dots), convertValue(value));
+    formData.append(renderKey(path6, key, dots), convertValue(value));
     return false;
   }
   const exposedHelpers = Object.assign(predicates, {
@@ -35822,17 +35833,17 @@ function toFormData(obj, formData, options) {
     convertValue,
     isVisitable
   });
-  function build(value, path5, depth = 0) {
+  function build(value, path6, depth = 0) {
     if (utils_default.isUndefined(value)) return;
     throwIfMaxDepthExceeded(depth);
     if (stack.indexOf(value) !== -1) {
-      throw new Error("Circular reference detected in " + path5.join("."));
+      throw new Error("Circular reference detected in " + path6.join("."));
     }
     stack.push(value);
     utils_default.forEach(value, function each(el, key) {
-      const result = !(utils_default.isUndefined(el) || el === null) && visitor.call(formData, el, utils_default.isString(key) ? key.trim() : key, path5, exposedHelpers);
+      const result = !(utils_default.isUndefined(el) || el === null) && visitor.call(formData, el, utils_default.isString(key) ? key.trim() : key, path6, exposedHelpers);
       if (result === true) {
-        build(el, path5 ? path5.concat(key) : [key], depth + 1);
+        build(el, path6 ? path6.concat(key) : [key], depth + 1);
       }
     });
     stack.pop();
@@ -36117,7 +36128,7 @@ var platform_default = {
 // node_modules/axios/lib/helpers/toURLEncodedForm.js
 function toURLEncodedForm(data, options) {
   return toFormData_default(data, new platform_default.classes.URLSearchParams(), {
-    visitor: function(value, key, path5, helpers) {
+    visitor: function(value, key, path6, helpers) {
       if (platform_default.isNode && utils_default.isBuffer(value)) {
         this.append(key, value.toString("base64"));
         return false;
@@ -36139,14 +36150,14 @@ function throwIfDepthExceeded(index) {
   }
 }
 function parsePropPath(name) {
-  const path5 = [];
+  const path6 = [];
   const pattern = /[^.[\]]+|\[([^.[\]]*)]/g;
   let match;
   while ((match = pattern.exec(name)) !== null) {
-    throwIfDepthExceeded(path5.length);
-    path5.push(match[0] === "[]" ? "" : match[1] || match[0]);
+    throwIfDepthExceeded(path6.length);
+    path6.push(match[0] === "[]" ? "" : match[1] || match[0]);
   }
-  return path5;
+  return path6;
 }
 function arrayToObject(arr) {
   const obj = {};
@@ -36161,12 +36172,12 @@ function arrayToObject(arr) {
   return obj;
 }
 function formDataToJSON(formData) {
-  function buildPath(path5, value, target, index) {
+  function buildPath(path6, value, target, index) {
     throwIfDepthExceeded(index);
-    let name = path5[index++];
+    let name = path6[index++];
     if (name === "__proto__") return true;
     const isNumericKey = Number.isFinite(+name);
-    const isLast = index >= path5.length;
+    const isLast = index >= path6.length;
     name = !name && utils_default.isArray(target) ? target.length : name;
     if (isLast) {
       if (utils_default.hasOwnProp(target, name)) {
@@ -36179,7 +36190,7 @@ function formDataToJSON(formData) {
     if (!utils_default.hasOwnProp(target, name) || !utils_default.isObject(target[name])) {
       target[name] = [];
     }
-    const result = buildPath(path5, value, target[name], index);
+    const result = buildPath(path6, value, target[name], index);
     if (result && utils_default.isArray(target[name])) {
       target[name] = arrayToObject(target[name]);
     }
@@ -38083,9 +38094,9 @@ var http_default = isHttpAdapterSupported && function httpAdapter(config) {
       auth = urlUsername + ":" + urlPassword;
     }
     auth && headers.delete("authorization");
-    let path5;
+    let path6;
     try {
-      path5 = buildURL(
+      path6 = buildURL(
         parsed.pathname + parsed.search,
         own2("params"),
         own2("paramsSerializer")
@@ -38107,7 +38118,7 @@ var http_default = isHttpAdapterSupported && function httpAdapter(config) {
       http2Options = Object.assign(/* @__PURE__ */ Object.create(null), http2Options, { lookup });
     }
     const options = Object.assign(/* @__PURE__ */ Object.create(null), {
-      path: path5,
+      path: path6,
       method,
       headers: toByteStringHeaderObject(headers),
       agents: { http: httpAgent, https: httpsAgent },
@@ -38523,14 +38534,14 @@ var isURLSameOrigin_default = platform_default.hasStandardBrowserEnv ? /* @__PUR
 var cookies_default = platform_default.hasStandardBrowserEnv ? (
   // Standard browser envs support document.cookie
   {
-    write(name, value, expires, path5, domain, secure, sameSite) {
+    write(name, value, expires, path6, domain, secure, sameSite) {
       if (typeof document === "undefined") return;
       const cookie = [`${name}=${encodeURIComponent(value)}`];
       if (utils_default.isNumber(expires)) {
         cookie.push(`expires=${new Date(expires).toUTCString()}`);
       }
-      if (utils_default.isString(path5)) {
-        cookie.push(`path=${path5}`);
+      if (utils_default.isString(path6)) {
+        cookie.push(`path=${path6}`);
       }
       if (utils_default.isString(domain)) {
         cookie.push(`domain=${domain}`);
@@ -40138,8 +40149,8 @@ axios.VERSION = VERSION;
 axios.toFormData = toFormData_default;
 axios.AxiosError = AxiosError_default;
 axios.Cancel = axios.CanceledError;
-axios.all = function all(promises3) {
-  return Promise.all(promises3);
+axios.all = function all(promises4) {
+  return Promise.all(promises4);
 };
 axios.spread = spread;
 axios.isAxiosError = isAxiosError;
@@ -40175,6 +40186,161 @@ var {
 // src/helpers.ts
 import * as os6 from "os";
 import * as fs4 from "fs";
+import * as net from "net";
+import * as dns from "dns";
+import * as path4 from "path";
+import * as crypto4 from "crypto";
+var DEFAULT_KUBECTL_BASE_URL = "https://dl.k8s.io";
+function normalizeBaseURL(input) {
+  const u = new URL(input);
+  return `${u.protocol}//${u.host}${u.pathname.replace(/\/+$/, "")}`;
+}
+function isDefaultBaseURL(input) {
+  try {
+    return normalizeBaseURL(input) === normalizeBaseURL(DEFAULT_KUBECTL_BASE_URL);
+  } catch {
+    return false;
+  }
+}
+var SECURE_DOWNLOAD_MAX_BYTES = 256 * 1024 * 1024;
+var SECURE_DOWNLOAD_MAX_REDIRECTS = 5;
+async function secureDownload(downloadURL, authToken = "") {
+  const client = new HttpClient("setup-kubectl", [], {
+    allowRedirects: false
+  });
+  const initialOrigin = new URL(downloadURL).origin;
+  let currentURL = downloadURL;
+  let response;
+  let status;
+  for (let hop = 0; hop <= SECURE_DOWNLOAD_MAX_REDIRECTS; hop++) {
+    await assertHostResolvesSafely(new URL(currentURL).hostname);
+    const sameOrigin = new URL(currentURL).origin === initialOrigin;
+    const headers = authToken && sameOrigin ? { Authorization: `Bearer ${authToken}` } : void 0;
+    response = await client.get(currentURL, headers);
+    status = response.message.statusCode;
+    if (!status || status < 300 || status >= 400) break;
+    const locationHeader = response.message.headers["location"];
+    const location = Array.isArray(locationHeader) ? locationHeader[0] : locationHeader;
+    response.message.resume();
+    if (!location) {
+      throw new Error(
+        `Redirect from custom downloadBaseURL had no Location header (status ${status}).`
+      );
+    }
+    if (hop === SECURE_DOWNLOAD_MAX_REDIRECTS) {
+      throw new Error(
+        `Refusing download: exceeded ${SECURE_DOWNLOAD_MAX_REDIRECTS} redirects from custom downloadBaseURL.`
+      );
+    }
+    const next = new URL(location, currentURL);
+    validateBaseURL(next.toString());
+    currentURL = next.toString();
+  }
+  if (status !== 200) {
+    response.message.resume();
+    throw typeof status === "number" ? new HTTPError(status) : new Error(
+      `Refusing download: no HTTP status returned for ${currentURL} (network or TLS error).`
+    );
+  }
+  const contentLengthHeader = response.message.headers["content-length"];
+  const contentLength = Array.isArray(contentLengthHeader) ? contentLengthHeader[0] : contentLengthHeader;
+  if (contentLength) {
+    const declared = Number.parseInt(contentLength, 10);
+    if (Number.isFinite(declared) && declared > SECURE_DOWNLOAD_MAX_BYTES) {
+      response.message.resume();
+      throw new Error(
+        `Refusing download: Content-Length ${declared} exceeds cap ${SECURE_DOWNLOAD_MAX_BYTES} bytes.`
+      );
+    }
+  }
+  const tmpDir = process.env["RUNNER_TEMP"] || os6.tmpdir();
+  const tmpFile = path4.join(tmpDir, `kubectl-${crypto4.randomUUID()}`);
+  const fd = fs4.openSync(tmpFile, "wx");
+  let received = 0;
+  let success = false;
+  try {
+    for await (const chunk of response.message) {
+      received += chunk.length;
+      if (received > SECURE_DOWNLOAD_MAX_BYTES) {
+        response.message.destroy();
+        throw new Error(
+          `Refusing download: response body exceeded cap ${SECURE_DOWNLOAD_MAX_BYTES} bytes.`
+        );
+      }
+      fs4.writeSync(fd, chunk);
+    }
+    success = true;
+  } finally {
+    try {
+      fs4.closeSync(fd);
+    } catch {
+    }
+    if (!success) {
+      try {
+        fs4.unlinkSync(tmpFile);
+      } catch {
+      }
+    }
+  }
+  return tmpFile;
+}
+function validateBaseURL(input) {
+  let url2;
+  try {
+    url2 = new URL(input);
+  } catch {
+    throw new Error(`Invalid downloadBaseURL: "${input}" is not a valid URL.`);
+  }
+  if (url2.protocol !== "https:") {
+    throw new Error(
+      `downloadBaseURL must use https://, got "${url2.protocol}" in "${input}".`
+    );
+  }
+  if (url2.username || url2.password) {
+    throw new Error(
+      "downloadBaseURL must not contain userinfo (user:pass@host)."
+    );
+  }
+  const host = url2.hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  const family = net.isIP(host);
+  if (family !== 0 && isBlockedIP(host, family)) {
+    throw new Error(
+      `downloadBaseURL host "${host}" is a literal loopback/link-local/private IP and is blocked.`
+    );
+  }
+  return url2;
+}
+function isBlockedIP(host, family) {
+  return host === "::1" || host === "::" || host === "0.0.0.0" || /^127\./.test(host) || /^169\.254\./.test(host) || /^10\./.test(host) || /^192\.168\./.test(host) || /^172\.(1[6-9]|2\d|3[0-1])\./.test(host) || family === 6 && /^f[cd]/.test(host) || // ULA fc00::/7
+  family === 6 && /^fe[89ab]/.test(host) || // link-local fe80::/10
+  family === 6 && host.startsWith("::ffff:");
+}
+async function assertHostResolvesSafely(hostname) {
+  const bare = hostname.replace(/^\[|\]$/g, "");
+  if (net.isIP(bare) !== 0) return;
+  let addresses;
+  try {
+    addresses = await dns.promises.lookup(bare, { all: true, verbatim: true });
+  } catch (err) {
+    throw new Error(
+      `Failed to resolve downloadBaseURL host "${bare}": ${err instanceof Error ? err.message : String(err)}`
+    );
+  }
+  for (const { address, family } of addresses) {
+    if (isBlockedIP(address.toLowerCase(), family)) {
+      throw new Error(
+        `downloadBaseURL host "${bare}" resolved to a blocked address (${address}); refusing to fetch.`
+      );
+    }
+  }
+}
+function validateVersion(version) {
+  if (!/^v?\d+\.\d+\.\d+$/.test(version)) {
+    throw new Error(
+      `Invalid kubectl version: "${version}". Expected a value like "v1.30.0".`
+    );
+  }
+}
 function getKubectlArch() {
   const arch4 = os6.arch();
   if (arch4 === "x64") {
@@ -40182,22 +40348,40 @@ function getKubectlArch() {
   }
   return arch4;
 }
-function getkubectlDownloadURL(version, arch4) {
+function getkubectlDownloadURL(version, arch4, baseURL = DEFAULT_KUBECTL_BASE_URL) {
+  validateVersion(version);
+  const url2 = validateBaseURL(baseURL);
+  let osDir;
+  let file;
   switch (os6.type()) {
     case "Linux":
-      return `https://dl.k8s.io/release/${version}/bin/linux/${arch4}/kubectl`;
+      osDir = "linux";
+      file = "kubectl";
+      break;
     case "Darwin":
-      return `https://dl.k8s.io/release/${version}/bin/darwin/${arch4}/kubectl`;
+      osDir = "darwin";
+      file = "kubectl";
+      break;
     case "Windows_NT":
     default:
-      return `https://dl.k8s.io/release/${version}/bin/windows/${arch4}/kubectl.exe`;
+      osDir = "windows";
+      file = "kubectl.exe";
+      break;
   }
+  const basePath = url2.pathname.replace(/\/+$/, "");
+  url2.pathname = `${basePath}/release/${version}/bin/${osDir}/${arch4}/${file}`;
+  return url2.toString();
 }
-async function getLatestPatchVersion(major, minor) {
+async function getLatestPatchVersion(major, minor, baseURL = DEFAULT_KUBECTL_BASE_URL, authToken = "") {
   const version = `${major}.${minor}`;
-  const sourceURL = `https://dl.k8s.io/release/stable-${version}.txt`;
+  const url2 = validateBaseURL(baseURL);
+  const basePath = url2.pathname.replace(/\/+$/, "");
+  url2.pathname = `${basePath}/release/stable-${version}.txt`;
+  const sourceURL = url2.toString();
+  const useSecure = !isDefaultBaseURL(baseURL);
+  let downloadPath = "";
   try {
-    const downloadPath = await downloadTool(sourceURL);
+    downloadPath = useSecure ? await secureDownload(sourceURL, authToken) : await downloadTool(sourceURL);
     const latestPatch = fs4.readFileSync(downloadPath, "utf8").toString().trim();
     if (!latestPatch) {
       throw new Error(`No patch version found for ${version}`);
@@ -40207,6 +40391,13 @@ async function getLatestPatchVersion(major, minor) {
     debug(String(error2));
     warning("GetLatestPatchVersionFailed");
     throw new Error(`Failed to get latest patch version for ${version}`);
+  } finally {
+    if (useSecure && downloadPath) {
+      try {
+        fs4.unlinkSync(downloadPath);
+      } catch {
+      }
+    }
   }
 }
 function getExecutableExtension() {
@@ -40259,47 +40450,107 @@ async function validateSubscription() {
 }
 var kubectlToolName = "kubectl";
 var stableKubectlVersion = "v1.15.0";
-var stableVersionUrl = "https://dl.k8s.io/release/stable.txt";
 async function run() {
   await validateSubscription();
   let version = getInput("version", { required: true });
-  if (version.toLocaleLowerCase() === "latest") {
-    version = await getStableKubectlVersion();
-  } else {
-    version = await resolveKubectlVersion(version);
+  const rawBaseURL = getInput("downloadBaseURL", { required: false }).trim();
+  const downloadBaseURL = rawBaseURL || DEFAULT_KUBECTL_BASE_URL;
+  validateBaseURL(downloadBaseURL);
+  const expectedChecksum = getInput("checksum", { required: false }).trim().toLowerCase();
+  const downloadAuthToken = getInput("downloadAuthToken", { required: false }).trim();
+  if (downloadAuthToken) {
+    setSecret(downloadAuthToken);
+    if (isDefaultBaseURL(downloadBaseURL)) {
+      throw new Error(
+        "`downloadAuthToken` was set but `downloadBaseURL` is the default (https://dl.k8s.io). Refusing to send a bearer token to the public Kubernetes mirror."
+      );
+    }
   }
-  const cachedPath = await downloadKubectl(version);
-  addPath(path4.dirname(cachedPath));
+  if (!isDefaultBaseURL(downloadBaseURL)) {
+    if (!expectedChecksum) {
+      throw new Error(
+        "Refusing to download from a custom `downloadBaseURL` without a `checksum`. On self-hosted runners an unverified binary would poison the tool cache and be reused across jobs. Set the `checksum` input to a 64-char SHA-256 to enable integrity verification."
+      );
+    }
+    notice(
+      `kubectl will be downloaded from a custom mirror: ${downloadBaseURL}`
+    );
+  }
+  if (version.trim().toLowerCase() === "latest") {
+    version = await getStableKubectlVersion(
+      downloadBaseURL,
+      downloadAuthToken
+    );
+  } else {
+    version = await resolveKubectlVersion(
+      version,
+      downloadBaseURL,
+      downloadAuthToken
+    );
+  }
+  const cachedPath = await downloadKubectl(
+    version,
+    downloadBaseURL,
+    expectedChecksum,
+    downloadAuthToken
+  );
+  addPath(path5.dirname(cachedPath));
   debug(
     `Kubectl tool version: '${version}' has been cached at ${cachedPath}`
   );
   setOutput("kubectl-path", cachedPath);
 }
-async function getStableKubectlVersion() {
-  return downloadTool(stableVersionUrl).then(
-    (downloadPath) => {
-      let version = fs5.readFileSync(downloadPath, "utf8").toString().trim();
-      if (!version) {
-        version = stableKubectlVersion;
-      }
-      return version;
-    },
-    (error2) => {
-      debug(error2);
-      warning("GetStableVersionFailed");
-      return stableKubectlVersion;
+async function getStableKubectlVersion(baseURL = DEFAULT_KUBECTL_BASE_URL, authToken = "") {
+  const url2 = validateBaseURL(baseURL);
+  const basePath = url2.pathname.replace(/\/+$/, "");
+  url2.pathname = `${basePath}/release/stable.txt`;
+  const stableVersionUrl = url2.toString();
+  const useSecure = !isDefaultBaseURL(baseURL);
+  let downloadPath = "";
+  try {
+    downloadPath = useSecure ? await secureDownload(stableVersionUrl, authToken) : await downloadTool(stableVersionUrl);
+    let version = fs5.readFileSync(downloadPath, "utf8").toString().trim();
+    if (!version) {
+      version = stableKubectlVersion;
     }
-  );
+    return version;
+  } catch (error2) {
+    debug(String(error2));
+    if (useSecure) {
+      throw new Error(
+        `Failed to fetch stable.txt from custom downloadBaseURL "${baseURL}".`
+      );
+    }
+    warning("GetStableVersionFailed");
+    return stableKubectlVersion;
+  } finally {
+    if (useSecure && downloadPath) {
+      try {
+        fs5.unlinkSync(downloadPath);
+      } catch {
+      }
+    }
+  }
 }
-async function downloadKubectl(version) {
-  let cachedToolpath = find(kubectlToolName, version);
+async function downloadKubectl(version, baseURL = DEFAULT_KUBECTL_BASE_URL, expectedChecksum = "", authToken = "") {
+  validateBaseURL(baseURL);
+  if (!isDefaultBaseURL(baseURL) && !expectedChecksum) {
+    throw new Error(
+      "Refusing to download from a custom `baseURL` without a `checksum`. Pass a 64-char SHA-256 to enable integrity verification."
+    );
+  }
+  const cacheKey = isDefaultBaseURL(baseURL) ? version : `${version}-${crypto5.createHash("sha256").update(normalizeBaseURL(baseURL)).digest("hex").slice(0, 12)}`;
+  let cachedToolpath = find(kubectlToolName, cacheKey);
   let kubectlDownloadPath = "";
   const arch4 = getKubectlArch();
   if (!cachedToolpath) {
+    const downloadURL = getkubectlDownloadURL(version, arch4, baseURL);
     try {
-      kubectlDownloadPath = await downloadTool(
-        getkubectlDownloadURL(version, arch4)
-      );
+      if (isDefaultBaseURL(baseURL)) {
+        kubectlDownloadPath = await downloadTool(downloadURL);
+      } else {
+        kubectlDownloadPath = await secureDownload(downloadURL, authToken);
+      }
     } catch (exception) {
       if (exception instanceof HTTPError && exception.httpStatusCode === 404) {
         throw new Error(
@@ -40309,25 +40560,49 @@ async function downloadKubectl(version) {
             arch4
           )
         );
-      } else {
-        throw new Error("DownloadKubectlFailed");
+      }
+      throw exception instanceof Error ? exception : new Error(`DownloadKubectlFailed: ${String(exception)}`);
+    }
+    try {
+      cachedToolpath = await cacheFile(
+        kubectlDownloadPath,
+        kubectlToolName + getExecutableExtension(),
+        kubectlToolName,
+        cacheKey
+      );
+    } finally {
+      if (!isDefaultBaseURL(baseURL) && kubectlDownloadPath) {
+        try {
+          fs5.unlinkSync(kubectlDownloadPath);
+        } catch {
+        }
       }
     }
-    cachedToolpath = await cacheFile(
-      kubectlDownloadPath,
-      kubectlToolName + getExecutableExtension(),
-      kubectlToolName,
-      version
-    );
   }
-  const kubectlPath = path4.join(
+  const kubectlPath = path5.join(
     cachedToolpath,
     kubectlToolName + getExecutableExtension()
   );
+  if (expectedChecksum) {
+    verifyChecksum(kubectlPath, expectedChecksum);
+  }
   fs5.chmodSync(kubectlPath, "775");
   return kubectlPath;
 }
-async function resolveKubectlVersion(version) {
+function verifyChecksum(filePath, expected) {
+  if (!/^[a-f0-9]{64}$/.test(expected)) {
+    throw new Error(
+      `Invalid checksum input: expected a 64-character hex SHA256 string.`
+    );
+  }
+  const actual = crypto5.createHash("sha256").update(fs5.readFileSync(filePath)).digest("hex");
+  if (actual !== expected) {
+    throw new Error(
+      `Checksum mismatch for downloaded kubectl. Expected ${expected}, got ${actual}.`
+    );
+  }
+}
+async function resolveKubectlVersion(version, baseURL = DEFAULT_KUBECTL_BASE_URL, authToken = "") {
   const cleanedVersion = version.trim();
   const versionMatch = cleanedVersion.match(
     /^v?(?<major>\d+)\.(?<minor>\d+)(?:\.(?<patch>\d+))?$/
@@ -40341,7 +40616,7 @@ async function resolveKubectlVersion(version) {
   if (patch) {
     return cleanedVersion.startsWith("v") ? cleanedVersion : `v${cleanedVersion}`;
   }
-  return await getLatestPatchVersion(major, minor);
+  return await getLatestPatchVersion(major, minor, baseURL, authToken);
 }
 
 // src/index.ts
